@@ -7,6 +7,10 @@ import (
   "crypto/tls"
 )
 
+type Extensions struct {
+  PersistedQuery PersistedQuery `json:"persistedQuery"`
+}
+
 type PersistedQuery struct {
   Version int `json:"version"`
   Sha256hash string `json:"sha256hash"`
@@ -14,7 +18,7 @@ type PersistedQuery struct {
 
 type BubsMeta struct {
   OperationName string `json:"operationName"`
-  Extensions PersistedQuery `json:"extensions"`
+  Extensions Extensions `json:"extensions"`
   Variables map[string]interface{} `json:variables`
 }
 
@@ -36,8 +40,8 @@ func NewGraph(url string, headers map[string]string) Graphene {
 func (client *Graphene) BubHostCheck(channel string) {
   req := BubsMeta{
     OperationName: "UseHosting",
-    Extensions: map[string]interface{}{
-      "persistedQuery": PersistedQuery{
+    Extensions: Extensions{
+      PersistedQuery: PersistedQuery{
         Version: 1,
         Sha256hash: "427f55a3daca510f726c02695a898ef3a0de4355b39af328848876052ea6b337",
       },
@@ -49,36 +53,6 @@ func (client *Graphene) BubHostCheck(channel string) {
   bytes, err := json.Marshal(req)
   if err != nil {
     log.Fatal("bubhostcheck", err)
-  }
-  client.call(string(bytes))
-}
-
-func (client *Graphene) BubMeta(channel string) {
-  creq := BubsMeta{
-    OperationName: "ChannelShell",
-    Extensions: PersistedQuery{
-      Version: 1,
-      Sha256hash: "c3ea5a669ec074a58df5c11ce3c27093fa38534c94286dc14b68a25d5adcbf55",
-    },
-    Variables: map[string]interface{}{
-      "login": channel,
-      "lcpVideosEnabled": false,
-    },
-  }
-  bubreq := BubsMeta{
-    OperationName: "StreamMetadata",
-    Extensions: PersistedQuery{
-      Version: 1,
-      Sha256hash: "059c4653b788f5bdb2f5a2d2a24b0ddc3831a15079001a3d927556a96fb0517f",
-    },
-    Variables: map[string]interface{}{
-      "channelLogin": channel,
-    },
-  }
-  reqs := []BubsMeta{creq, bubreq}
-  bytes, err := json.Marshal(reqs)
-  if err != nil {
-    log.Fatal("why why why why", err)
   }
   client.call(string(bytes))
 }
