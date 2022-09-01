@@ -9,11 +9,11 @@ import (
 
 type MainBub struct {
   BaseUrl string
+  Bubs []string
 }
 
 type Bubs struct {
   Bub MainBub
-  Array []string
 }
 
 func read_bubs(bubs *Bubs) {
@@ -29,7 +29,7 @@ func read_bubs(bubs *Bubs) {
 }
 
 func check_haha(bubs Bubs) {
-  for _, bub := range bubs.Array {
+  for _, bub := range bubs.Bub.Bubs {
     log.Println(bub)
   }
 }
