@@ -16,16 +16,18 @@ type Bubs struct {
   Bub MainBub
 }
 
-func read_bubs(bubs *Bubs) {
+func read_bubs() (Bubs) {
   bub := "bubs.toml"
   bytes, err := os.ReadFile(bub)
   if err != nil {
     log.Fatal(err)
   }
-  e := toml.Unmarshal(bytes, bubs)
+  var bubs Bubs
+  e := toml.Unmarshal(bytes, &bubs)
   if e != nil {
     log.Fatal(e)
   }
+  return bubs
 }
 
 func check_haha(bubs Bubs) {
@@ -35,7 +37,6 @@ func check_haha(bubs Bubs) {
 }
 
 func main() {
-  var bubs Bubs
-  read_bubs(&bubs)
+  bubs := read_bubs()
   check_haha(bubs)
 }
