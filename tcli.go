@@ -1,23 +1,42 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"strings"
+  "log"
+  "os"
+  //"github.com/go-resty/resty/v2"
+  "github.com/pelletier/go-toml/v2"
 )
 
-func get_env(keys []string) {
-	for _, str := range os.Environ() {
-		parts := strings.SplitN(str, "=", 2)
-		for _, key := range keys {
-			if key == parts[0] {
-				fmt.Println(key, ":", parts[1])
-				return
-			}
-		}
-	}
+type MainBub struct {
+  BaseUrl string
+}
+
+type Bubs struct {
+  Bub MainBub
+  Ubs []string
+}
+
+func read_bubs(bubs Bubs) {
+  bub := "bubs.toml"
+  bytes, err := os.ReadFile(bub)
+  if err != nil {
+    log.Fatal(err)
+  }
+  e := toml.Unmarshal(bytes, &bubs)
+  if e != nil {
+    log.Fatal(err)
+  }
+}
+
+func check_haha(bubs Bubs) {
+  for _, bub := range bubs.Ubs {
+    log.Println(bub)
+  }
 }
 
 func main() {
-	get_env([]string{"TWITCH_ID"})
+  var bubs Bubs
+  read_bubs(bubs)
+  log.Println(bubs)
+  check_haha(bubs)
 }
