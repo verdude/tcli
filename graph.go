@@ -2,7 +2,6 @@ package main
 
 import (
   "log"
-  "encoding/json"
   "github.com/go-resty/resty/v2"
   "crypto/tls"
 )
@@ -16,7 +15,7 @@ type PersistedQuery struct {
   Sha256hash string `json:"sha256hash"`
 }
 
-type BubsMeta struct {
+type GraphQuery struct {
   OperationName string `json:"operationName"`
   Extensions Extensions `json:"extensions"`
   Variables map[string]interface{} `json:variables`
@@ -37,8 +36,8 @@ func NewGraph(url string, headers map[string]string) Graphene {
   }
 }
 
-func (client *Graphene) BubHostCheck(channel string) {
-  req := BubsMeta{
+func (client *Graphene) BubHostCheck(channel string) GraphQuery {
+  query := GraphQuery{
     OperationName: "UseHosting",
     Extensions: Extensions{
       PersistedQuery: PersistedQuery{
@@ -50,11 +49,36 @@ func (client *Graphene) BubHostCheck(channel string) {
       "channelLogin": channel,
     },
   }
-  bytes, err := json.Marshal(req)
-  if err != nil {
-    log.Fatal("bubhostcheck", err)
+  return query
+}
+
+func (client *Graphene) BubMeta(channel string) []GraphQuery {
+  query1 := GraphQuery{
+    OperationName: "ChannelShell",
+    Extensions: Extensions{
+      PersistedQuery{
+        Version: 1,
+        Sha256hash: "c3ea5a669ec074a58df5c11ce3c27093fa38534c94286dc14b68a25d5adcbf55",
+      },
+    },
+    Variables: map[string]interface{}{
+      "login": channel,
+      "lcpVideosEnabled": false,
+    },
   }
-  client.call(string(bytes))
+  query2 := GraphQuery{
+    OperationName: "StreamMetadata",
+    Extensions: Extensions{
+      PersistedQuery{
+        Version: 1,
+        Sha256hash: "059c4653b788f5bdb2f5a2d2a24b0ddc3831a15079001a3d927556a96fb0517f",
+      },
+    },
+    Variables: map[string]interface{}{
+      "channelLogin": channel,
+    },
+  }
+  return []GraphQuery{query1, query2}
 }
 
 func (client *Graphene) call(req string) {

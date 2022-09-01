@@ -32,9 +32,11 @@ func read_bubs() (Bubs) {
 
 func check_haha(bubs Bubs) {
   graph := NewGraph(bubs.Bub.BaseUrl, bubs.Bub.Headers)
+  queries := make([]GraphQuery, 32)
   for _, bub := range bubs.Bub.Bubs {
-    graph.BubHostCheck(bub)
+    queries = append(queries, graph.BubHostCheck(bub))
   }
+  log.Println(len(queries))
 }
 
 func main() {
