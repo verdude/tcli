@@ -3,13 +3,13 @@ package main
 import (
   "log"
   "os"
-  //"github.com/go-resty/resty/v2"
   "github.com/pelletier/go-toml/v2"
 )
 
 type MainBub struct {
   BaseUrl string
   Bubs []string
+  Headers map[string]string
 }
 
 type Bubs struct {
@@ -31,8 +31,9 @@ func read_bubs() (Bubs) {
 }
 
 func check_haha(bubs Bubs) {
+  graph := NewGraph(bubs.Bub.BaseUrl, bubs.Bub.Headers)
   for _, bub := range bubs.Bub.Bubs {
-    log.Println(bub)
+    graph.BubHostCheck(bub)
   }
 }
 
