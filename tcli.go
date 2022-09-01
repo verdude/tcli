@@ -13,30 +13,29 @@ type MainBub struct {
 
 type Bubs struct {
   Bub MainBub
-  Ubs []string
+  Array []string
 }
 
-func read_bubs(bubs Bubs) {
+func read_bubs(bubs *Bubs) {
   bub := "bubs.toml"
   bytes, err := os.ReadFile(bub)
   if err != nil {
     log.Fatal(err)
   }
-  e := toml.Unmarshal(bytes, &bubs)
+  e := toml.Unmarshal(bytes, bubs)
   if e != nil {
-    log.Fatal(err)
+    log.Fatal(e)
   }
 }
 
 func check_haha(bubs Bubs) {
-  for _, bub := range bubs.Ubs {
+  for _, bub := range bubs.Array {
     log.Println(bub)
   }
 }
 
 func main() {
   var bubs Bubs
-  read_bubs(bubs)
-  log.Println(bubs)
+  read_bubs(&bubs)
   check_haha(bubs)
 }
