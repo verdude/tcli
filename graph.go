@@ -2,6 +2,8 @@ package main
 
 import (
   "log"
+  "fmt"
+  "encoding/json"
   "github.com/go-resty/resty/v2"
   "crypto/tls"
 )
@@ -24,6 +26,7 @@ type GraphQuery struct {
 type Graphene struct {
   client *resty.Client
   baseUrl string
+  Queries []GraphQuery
 }
 
 func NewGraph(url string, headers map[string]string) Graphene {
@@ -78,14 +81,22 @@ func (client *Graphene) BubMeta(channel string) []GraphQuery {
       "channelLogin": channel,
     },
   }
-  return []GraphQuery{query1, query2}
+  return []GraphQuery{query1, query2, client.BubHostCheck(channel)}
 }
 
 func (client *Graphene) call(req string) {
-  log.Println(req)
   resp, err := client.client.R().SetBody(req).Post(client.baseUrl)
   if err != nil {
     log.Fatal(err)
   }
   log.Println(resp)
+}
+
+func (client *Graphene) Resolve() {
+  bytes, err := json.Marshal(client.Queries)
+  if err != nil {
+    log.Fatal("Something about you is haunting my mind", err)
+  }
+  fmt.Println(string(bytes))
+  //client.call(string(bytes))
 }

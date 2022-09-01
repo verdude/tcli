@@ -30,16 +30,20 @@ func read_bubs() (Bubs) {
   return bubs
 }
 
-func check_haha(bubs Bubs) {
+func check_haha(bubs Bubs) Graphene {
   graph := NewGraph(bubs.Bub.BaseUrl, bubs.Bub.Headers)
-  queries := make([]GraphQuery, 32)
+  queries := [][]GraphQuery{}
   for _, bub := range bubs.Bub.Bubs {
-    queries = append(queries, graph.BubHostCheck(bub))
+    queries = append(queries, graph.BubMeta(bub))
   }
   log.Println(len(queries))
+  graph.Queries = queries
+  return graph
 }
 
 func main() {
   bubs := read_bubs()
-  check_haha(bubs)
+  graph := check_haha(bubs)
+  log.Println("Created", len(graph.Queries), "queries")
+  graph.Resolve()
 }
