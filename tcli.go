@@ -30,20 +30,17 @@ func read_bubs() (Bubs) {
   return bubs
 }
 
-func check_haha(bubs Bubs) Graphene {
-  graph := NewGraph(bubs.Bub.BaseUrl, bubs.Bub.Headers)
-  queries := [][]GraphQuery{}
-  for _, bub := range bubs.Bub.Bubs {
-    queries = append(queries, graph.BubMeta(bub))
-  }
-  log.Println(len(queries))
-  graph.Queries = queries
-  return graph
-}
-
 func main() {
+  f, err := os.OpenFile("test.log", os.O_APPEND | os.O_CREATE | os.O_RDWR, 0600)
+  if err != nil {
+    log.Fatal("so sad")
+  }
+  log.SetOutput(f)
+  defer f.Close()
+  log.Println("Booting...")
   bubs := read_bubs()
-  graph := check_haha(bubs)
-  log.Println("Created", len(graph.Queries), "queries")
-  graph.Resolve()
+  log.Println("Got bubs:", bubs.Bub.Bubs)
+  graph := NewGraph(bubs.Bub.BaseUrl, bubs.Bub.Headers)
+  log.Println("Baseurl:", bubs.Bub.BaseUrl)
+  graph.Resolve(bubs)
 }

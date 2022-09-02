@@ -26,7 +26,6 @@ type GraphQuery struct {
 type Graphene struct {
   client *resty.Client
   baseUrl string
-  Queries []GraphQuery
 }
 
 func NewGraph(url string, headers map[string]string) Graphene {
@@ -39,7 +38,7 @@ func NewGraph(url string, headers map[string]string) Graphene {
   }
 }
 
-func (client *Graphene) BubHostCheck(channel string) GraphQuery {
+func (graph *Graphene) BubHostCheck(channel string) GraphQuery {
   query := GraphQuery{
     OperationName: "UseHosting",
     Extensions: Extensions{
@@ -55,7 +54,7 @@ func (client *Graphene) BubHostCheck(channel string) GraphQuery {
   return query
 }
 
-func (client *Graphene) BubMeta(channel string) []GraphQuery {
+func (graph *Graphene) BubMeta(channel string) []GraphQuery {
   query1 := GraphQuery{
     OperationName: "ChannelShell",
     Extensions: Extensions{
@@ -81,22 +80,32 @@ func (client *Graphene) BubMeta(channel string) []GraphQuery {
       "channelLogin": channel,
     },
   }
-  return []GraphQuery{query1, query2, client.BubHostCheck(channel)}
+  queries := make([]GraphQuery, 3)
+  queries[0] = graph.BubHostCheck(channel)
+  queries[1] = query2
+  queries[2] = query1
+  return queries
 }
 
-func (client *Graphene) call(req string) {
-  resp, err := client.client.R().SetBody(req).Post(client.baseUrl)
+func (graph *Graphene) Resolve(bubs Bubs) {
+  queries := [][]GraphQuery{}
+  for _, bub := range bubs.Bub.Bubs {
+    queries = append(queries, graph.BubMeta(bub))
+  }
+  log.Println("Created", len(queries), "* 3 queries")
+  for _, q := range queries {
+    bytes, err := json.Marshal(q)
+    if err != nil {
+      log.Fatal("Something about you is haunting my mind", err)
+    }
+    log.Println(string(bytes))
+  }
+}
+
+func (graph *Graphene) call(req string) {
+  resp, err := graph.client.R().SetBody(req).Post(graph.baseUrl)
   if err != nil {
     log.Fatal(err)
   }
-  log.Println(resp)
-}
-
-func (client *Graphene) Resolve() {
-  bytes, err := json.Marshal(client.Queries)
-  if err != nil {
-    log.Fatal("Something about you is haunting my mind", err)
-  }
-  fmt.Println(string(bytes))
-  //client.call(string(bytes))
+  fmt.Println(resp)
 }
