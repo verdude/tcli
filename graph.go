@@ -118,7 +118,7 @@ func (graph *Graphene) Resolve(bubs Bubs) {
 }
 
 func (graph *Graphene) call(req string) {
-  respFormat := [3]interface{Hosting{}}
+  respFormat := [3]Hosting{}
   resp, err := graph.client.R().SetBody(req).SetResult(&respFormat).Post(graph.baseUrl)
   if err != nil {
     log.Fatal(err)

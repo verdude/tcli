@@ -1,4 +1,12 @@
-*.toml
-tcli
 *.log
+*.toml
 *.txt
+tcli
+\#*\#
+.\#*
+*.o
+build/
+assets/
+.terraform/
+.terraform*
+terraform.tfstate*
