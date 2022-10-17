@@ -1,2 +1,4 @@
 *.toml
 tcli
+*.log
+*.txt

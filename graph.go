@@ -8,6 +8,19 @@ import (
   "crypto/tls"
 )
 
+type User struct {
+  Id string
+  Hosting string
+}
+
+type UserHosting struct {
+  Usr User
+}
+
+type Hosting struct {
+  Data UserHosting
+}
+
 type Extensions struct {
   PersistedQuery PersistedQuery `json:"persistedQuery"`
 }
@@ -31,6 +44,7 @@ type Graphene struct {
 func NewGraph(url string, headers map[string]string) Graphene {
   client := resty.New()
   client.SetHeaders(headers)
+  client.SetHeader("Content-Type", "application/json")
   client.SetTLSClientConfig(&tls.Config{ InsecureSkipVerify: true })
   return Graphene {
     client: client,
@@ -98,12 +112,14 @@ func (graph *Graphene) Resolve(bubs Bubs) {
     if err != nil {
       log.Fatal("Something about you is haunting my mind", err)
     }
-    log.Println(string(bytes))
+    log.Println("Querying for bub:", q[0].Variables["channelLogin"])
+    graph.call(string(bytes))
   }
 }
 
 func (graph *Graphene) call(req string) {
-  resp, err := graph.client.R().SetBody(req).Post(graph.baseUrl)
+  respFormat := [3]interface{Hosting{}}
+  resp, err := graph.client.R().SetBody(req).SetResult(&respFormat).Post(graph.baseUrl)
   if err != nil {
     log.Fatal(err)
   }
