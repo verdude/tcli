@@ -5,7 +5,7 @@ EXEPATH := $(BUILDROOT)/$(EXE)
 CONF_PREFIX := /etc/$(PROJECT)
 
 LOGFILE := tcli.log
-CONFIGFILE := config.toml
+CONFIGFILE := config.toml.example
 
 .PHONY: all
 all: $(EXEPATH)
