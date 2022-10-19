@@ -6,6 +6,9 @@ import (
 	"os"
 )
 
+var logfile string
+var config string
+
 type MainBub struct {
 	BaseUrl string
 	Bubs    []string
@@ -17,7 +20,7 @@ type Bubs struct {
 }
 
 func read_bubs() Bubs {
-	bub := "bubs.toml"
+	bub := config
 	bytes, err := os.ReadFile(bub)
 	if err != nil {
 		log.Fatal(err)
@@ -31,9 +34,9 @@ func read_bubs() Bubs {
 }
 
 func main() {
-	f, err := os.OpenFile("tcli.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0600)
+	f, err := os.OpenFile(logfile, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0600)
 	if err != nil {
-		log.Fatal("so sad", err)
+		log.Fatal("so sad: ", err)
 	}
 	log.SetOutput(f)
 	defer f.Close()
