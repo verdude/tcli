@@ -1,8 +1,9 @@
 PROJECT := tcli
 BUILDROOT := build
-EXE := tcli
+EXE := $(PROJECT)
 EXEPATH := $(BUILDROOT)/$(EXE)
-CONF_PREFIX := /etc/$(PROJECT)
+CONF_PREFIX := .
+LOG_PREFIX := $(CONF_PREFIX)
 
 LOGFILE := tcli.log
 CONFIGFILE := config.toml.example
@@ -11,7 +12,8 @@ CONFIGFILE := config.toml.example
 all: $(EXEPATH)
 
 $(EXEPATH): $(wildcard *.go)
-	go build -o $(EXEPATH) -ldflags='-X main.logfile=$(LOGFILE) -X main.config=$(CONFIGFILE)'
+	go build -o $(EXEPATH) -ldflags='-X main.logfile=$(CONF_PREFIX)/$(LOGFILE) -X main.config=$(CONF_PREFIX)/$(CONFIGFILE)'
+
 
 $(BUILDROOT):
 	mkdir -p $(BUILDROOT)
@@ -28,12 +30,8 @@ clean:
 	rm -f tcli *.txt *.log
 	rm -rf $(BUILDROOT)
 
-.PHONY: release
-release:
-	go build -o $(EXEPATH) -ldflags='-X main.logfile=$(CONF_PREFIX)/$(LOGFILE) -X main.config=$(CONF_PREFIX)/$(CONFIGFILE)'
-
 .PHONY: install
 install: $(EXEPATH)
 	strip $(EXEPATH)
-	install -D -m 644 $(CONFIGFILE) $(DESTDIR)/etc/tcli/$(CONFIGFILE)
+	install -D -m 666 $(CONFIGFILE) $(DESTDIR)/etc/tcli/$(CONFIGFILE)
 	install -D -m 755 $(EXEPATH) $(DESTDIR)/usr/bin/$(EXE)
