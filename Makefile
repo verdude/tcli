@@ -35,5 +35,5 @@ clean:
 install: $(EXEPATH)
 	strip $(EXEPATH)
 	cp $(EXAMPLE_CONFIGFILE) $(CONFIGFILE)
-	install -D -m 666 $(CONFIGFILE) $(DESTDIR)/etc/tcli/$(CONFIGFILE)
+	install -D -m 666 $(CONFIGFILE) $(DESTDIR)/etc/$(PROJECT)/$(CONFIGFILE)
 	install -D -m 755 $(EXEPATH) $(DESTDIR)/usr/bin/$(EXE)
