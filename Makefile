@@ -6,7 +6,8 @@ CONF_PREFIX := .
 LOG_PREFIX := $(CONF_PREFIX)
 
 LOGFILE := tcli.log
-CONFIGFILE := config.toml.example
+EXAMPLE_CONFIGFILE := config.toml.example
+CONFIGFILE := $(EXAMPLE_CONFIGFILE)
 
 .PHONY: all
 all: $(EXEPATH)
@@ -33,5 +34,6 @@ clean:
 .PHONY: install
 install: $(EXEPATH)
 	strip $(EXEPATH)
+	cp $(EXAMPLE_CONFIGFILE) $(CONFIGFILE)
 	install -D -m 666 $(CONFIGFILE) $(DESTDIR)/etc/tcli/$(CONFIGFILE)
 	install -D -m 755 $(EXEPATH) $(DESTDIR)/usr/bin/$(EXE)
