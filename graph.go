@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/go-resty/resty/v2"
 	"log"
+	"sync"
 )
 
 type StreamMetaBase struct {
@@ -72,6 +73,7 @@ func (graph *Graphene) BubMeta(channel string) GraphQuery {
 }
 
 func (graph *Graphene) Resolve(bubs Bubs) {
+	var group sync.WaitGroup
 	for _, bub := range bubs.Bub.Bubs {
 		q := graph.BubMeta(bub)
 		bytes, err := json.Marshal(q)
@@ -79,11 +81,15 @@ func (graph *Graphene) Resolve(bubs Bubs) {
 			log.Fatal("Something about you is haunting my mind", err)
 		}
 		log.Println("Querying for bub:", q.Variables["channelLogin"])
-		graph.call(string(bytes), bub)
+
+		group.Add(1)
+		go graph.call(string(bytes), bub, &group)
 	}
+	group.Wait()
 }
 
-func (graph *Graphene) call(req string, bub string) {
+func (graph *Graphene) call(req string, bub string, group *sync.WaitGroup) {
+	defer group.Done()
 	respFormat := StreamMetaBase{}
 	_, err := graph.client.R().SetBody(req).SetResult(&respFormat).Post(graph.baseUrl)
 	if err != nil {
@@ -92,7 +98,9 @@ func (graph *Graphene) call(req string, bub string) {
 
 	if respFormat.Data.User.Stream != nil {
 		fmt.Println(bub, ":", respFormat.Data.User.Stream.Type)
+		log.Println(bub, ":", respFormat.Data.User.Stream.Type)
 	} else {
 		fmt.Println(bub, ": offline")
+		log.Println(bub, ": offline")
 	}
 }
