@@ -13,7 +13,7 @@ CONFIGFILE := $(EXAMPLE_CONFIGFILE)
 all: $(EXEPATH)
 
 $(EXEPATH): $(wildcard *.go)
-	go build -o $(EXEPATH) -ldflags='-X main.logfile=$(CONF_PREFIX)/$(LOGFILE) -X main.config=$(CONF_PREFIX)/$(CONFIGFILE)'
+	go build -o $(EXEPATH) -ldflags='-X main.logfile=$(LOG_PREFIX)/$(LOGFILE) -X main.config=$(CONF_PREFIX)/$(CONFIGFILE)'
 
 
 $(BUILDROOT):
