@@ -80,7 +80,6 @@ func (graph *Graphene) Resolve(bubs Bubs) {
 		if err != nil {
 			log.Fatal("Something about you is haunting my mind", err)
 		}
-		log.Println("Querying for bub:", q.Variables["channelLogin"])
 
 		group.Add(1)
 		go graph.call(string(bytes), bub, &group)
