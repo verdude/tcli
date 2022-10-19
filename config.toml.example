@@ -1,0 +1,6 @@
+[bub]
+baseUrl = ""
+bubs = []
+
+[bub.headers]
+Client-ID = ""
