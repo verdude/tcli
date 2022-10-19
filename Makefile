@@ -36,4 +36,4 @@ release:
 install: $(EXEPATH)
 	strip $(EXEPATH)
 	install -D -m 644 $(CONFIGFILE) $(DESTDIR)/etc/tcli/$(CONFIGFILE)
-	install -D -m 511 $(EXEPATH) $(DESTDIR)/usr/bin/$(EXE)
+	install -D -m 755 $(EXEPATH) $(DESTDIR)/usr/bin/$(EXE)
