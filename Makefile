@@ -10,7 +10,7 @@ CONFIGFILE := config.toml
 all: $(EXEPATH)
 
 $(EXEPATH): $(wildcard *.go)
-	go build -ldflags='-X main.logfile=$(LOGFILE)'
+	go build -ldflags='-X main.logfile=$(LOGFILE) -X main.config=$(CONFIGFILE)'
 
 $(BUILDROOT):
 	mkdir -p $(BUILDROOT)
