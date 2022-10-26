@@ -3,7 +3,7 @@ BUILDROOT := build
 EXE := $(PROJECT)
 EXEPATH := $(BUILDROOT)/$(EXE)
 CONF_PREFIX := .
-LOG_PREFIX := $(CONF_PREFIX)
+LOG_PREFIX := .
 
 LOGFILE := tcli.log
 EXAMPLE_CONFIGFILE := config.toml.example

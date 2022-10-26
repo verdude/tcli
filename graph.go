@@ -98,8 +98,5 @@ func (graph *Graphene) call(req string, bub string, group *sync.WaitGroup) {
 	if respFormat.Data.User.Stream != nil {
 		fmt.Println(bub, ":", respFormat.Data.User.Stream.Type)
 		log.Println(bub, ":", respFormat.Data.User.Stream.Type)
-	} else {
-		fmt.Println(bub, ": offline")
-		log.Println(bub, ": offline")
 	}
 }
