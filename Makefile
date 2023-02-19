@@ -33,9 +33,8 @@ clean:
 
 .PHONY: install
 install: $(EXEPATH)
-	strip $(EXEPATH)
 ifneq ($(EXAMPLE_CONFIGFILE),$(CONFIGFILE))
 	cp $(EXAMPLE_CONFIGFILE) $(CONFIGFILE)
 endif
 	install -D -m 666 $(CONFIGFILE) $(DESTDIR)/etc/$(PROJECT)/$(CONFIGFILE)
-	install -D -m 755 $(EXEPATH) $(DESTDIR)/usr/bin/$(EXE)
+	install -D -m 755 -s $(EXEPATH) $(DESTDIR)/usr/bin/$(EXE)
