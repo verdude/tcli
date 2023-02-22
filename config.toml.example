@@ -4,3 +4,5 @@ bubs = []
 
 [bub.headers]
 Client-ID = ""
+referer = ""
+origin = ""
