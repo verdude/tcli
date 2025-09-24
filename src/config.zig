@@ -72,6 +72,12 @@ pub fn loadConfig(allocator: std.mem.Allocator, path: []const u8) !Config {
     const Section = enum { none, bub, bub_headers };
     var section: Section = .none;
 
+    // Support for multiline arrays (only needed for `bubs`)
+    var reading_bubs_array = false;
+    var bubs_accum = std.ArrayListUnmanaged(u8){};
+    defer bubs_accum.deinit(allocator);
+    var bubs_bracket_depth: i32 = 0;
+
     var line_it = std.mem.splitScalar(u8, content, '\n');
     while (line_it.next()) |line_raw| {
         var line = line_raw;
@@ -92,6 +98,31 @@ pub fn loadConfig(allocator: std.mem.Allocator, path: []const u8) !Config {
             continue;
         }
 
+        // If currently reading a multiline bubs array, keep accumulating
+        if (reading_bubs_array) {
+            // Add a separating space to avoid token sticking
+            if (bubs_accum.items.len > 0) try bubs_accum.append(allocator, ' ');
+            try bubs_accum.appendSlice(allocator, line);
+            // Update bracket depth
+            var i: usize = 0;
+            while (i < line.len) : (i += 1) {
+                const c = line[i];
+                if (c == '[') bubs_bracket_depth += 1 else if (c == ']') bubs_bracket_depth -= 1;
+            }
+            if (bubs_bracket_depth <= 0) {
+                // Finished accumulating, parse now
+                const arr = try parseArrayOfStrings(allocator, bubs_accum.items);
+                // Replace if set twice
+                for (bubs_buf.items) |s| allocator.free(s);
+                bubs_buf.clearRetainingCapacity();
+                for (arr) |s| try bubs_buf.append(allocator, s);
+                allocator.free(arr);
+                reading_bubs_array = false;
+                bubs_accum.clearRetainingCapacity();
+            }
+            continue;
+        }
+
         switch (section) {
             .bub => {
                 if (std.mem.indexOfScalar(u8, line, '=')) |eq| {
@@ -102,9 +133,25 @@ pub fn loadConfig(allocator: std.mem.Allocator, path: []const u8) !Config {
                         if (base_url_buf != null) return error.DuplicateBaseUrl;
                         base_url_buf = try allocator.dupe(u8, unq);
                     } else if (std.mem.eql(u8, key, "bubs")) {
-                        const arr = try parseArrayOfStrings(allocator, val);
-                        for (arr) |s| try bubs_buf.append(allocator, s);
-                        allocator.free(arr);
+                        // If value contains an opening bracket without closing on the same line,
+                        // start accumulating multiline array.
+                        var open_count: i32 = 0;
+                        var close_count: i32 = 0;
+                        var j: usize = 0;
+                        while (j < val.len) : (j += 1) {
+                            if (val[j] == '[') open_count += 1 else if (val[j] == ']') close_count += 1;
+                        }
+                        if (open_count > close_count) {
+                            // Begin multiline accumulation
+                            reading_bubs_array = true;
+                            bubs_bracket_depth = open_count - close_count;
+                            // seed the accumulator with current value
+                            try bubs_accum.appendSlice(allocator, val);
+                        } else {
+                            const arr = try parseArrayOfStrings(allocator, val);
+                            for (arr) |s| try bubs_buf.append(allocator, s);
+                            allocator.free(arr);
+                        }
                     }
                 }
             },
