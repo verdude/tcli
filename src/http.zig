@@ -1,5 +1,4 @@
 const std = @import("std");
-const root = @import("root.zig");
 const config = @import("config.zig");
 
 pub const HttpClient = struct {

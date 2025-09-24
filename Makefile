@@ -9,7 +9,11 @@ CONFIGFILE := $(EXAMPLE_CONFIGFILE)
 all: $(EXEPATH)
 
 $(EXEPATH): build.zig src/*.zig
-	zig build -Doptimize=ReleaseSmall
+	zig build -Doptimize=ReleaseSmall \
+		-Dproject=$(PROJECT) \
+		-Dconf_prefix=$(CONF_PREFIX) \
+		-Dlog_prefix=$(LOG_PREFIX) \
+		-Dconfigfile=$(CONFIGFILE)
 
 .PHONY: test
 test:

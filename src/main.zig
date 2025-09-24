@@ -1,43 +1,22 @@
 const std = @import("std");
 const config = @import("config.zig");
+const build_options = @import("build_options");
 const http = @import("http.zig");
-const model = @import("root.zig");
+const model = @import("graph.zig");
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
 
-    // Read env for overrides
-    var env = try std.process.getEnvMap(allocator);
-    defer env.deinit();
+    var args_it = try std.process.argsWithAllocator(allocator);
+    defer args_it.deinit();
+    _ = args_it.skip(); // exe name
 
-    var args = try std.process.argsWithAllocator(allocator);
-    defer args.deinit();
+    const config_path: []const u8 = build_options.default_config_path;
+    const log_path: []const u8 = build_options.default_log_path;
 
-    _ = args.skip(); // exe name
-    var config_path_owned: ?[]const u8 = null;
-    defer if (config_path_owned) |s| allocator.free(s);
-    var log_path_owned: ?[]const u8 = null;
-    defer if (log_path_owned) |s| allocator.free(s);
-
-    var config_path: []const u8 = "config.toml.example";
-    var log_path: []const u8 = "tcli.log";
-
-    if (env.get("TCLI_CONFIG")) |cp| {
-        config_path_owned = try allocator.dupe(u8, cp);
-        config_path = config_path_owned.?;
-    }
-    if (env.get("TCLI_LOGFILE")) |lp| {
-        log_path_owned = try allocator.dupe(u8, lp);
-        log_path = log_path_owned.?;
-    }
-
-    if (args.next()) |cp_arg| {
-        if (config_path_owned) |s| allocator.free(s);
-        config_path_owned = try allocator.dupe(u8, cp_arg);
-        config_path = config_path_owned.?;
-    }
+    if (args_it.next()) |_| {}
 
     var cfg = try config.loadConfig(allocator, config_path);
     defer cfg.deinit(allocator);
