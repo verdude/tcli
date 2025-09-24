@@ -26,6 +26,13 @@ pub fn build(b: *std.Build) void {
     });
     exe.root_module.addOptions("build_options", opts);
 
+    // Expose this package as a reusable Zig module for dependents
+    const tcli_module = b.addModule("tcli", .{
+        .root_source_file = b.path("src/root.zig"),
+    });
+    // Make the module importable within this executable as well
+    exe.root_module.addImport("tcli", tcli_module);
+
     b.installArtifact(exe);
 
     const run_step = b.step("run", "Run the app");
