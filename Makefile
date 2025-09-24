@@ -9,7 +9,7 @@ CONFIGFILE := $(EXAMPLE_CONFIGFILE)
 all: $(EXEPATH)
 
 $(EXEPATH): build.zig src/*.zig
-	zig build -Doptimize=ReleaseFast
+	zig build -Doptimize=ReleaseSmall
 
 .PHONY: test
 test:
