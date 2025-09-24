@@ -1,35 +1,28 @@
 PROJECT := tcli
-BUILDROOT := build
+BUILDROOT := zig-out
 EXE := $(PROJECT)
-EXEPATH := $(BUILDROOT)/$(EXE)
-CONF_PREFIX := .
-LOG_PREFIX := .
-
-LOGFILE := tcli.log
+EXEPATH := $(BUILDROOT)/bin/$(EXE)
 EXAMPLE_CONFIGFILE := config.toml.example
 CONFIGFILE := $(EXAMPLE_CONFIGFILE)
 
 .PHONY: all
 all: $(EXEPATH)
 
-$(EXEPATH): $(wildcard *.go)
-	go build -o $(EXEPATH) -ldflags='-X main.logfile=$(LOG_PREFIX)/$(LOGFILE) -X main.config=$(CONF_PREFIX)/$(CONFIGFILE)'
-
-
-$(BUILDROOT):
-	mkdir -p $(BUILDROOT)
+$(EXEPATH): build.zig src/*.zig
+	zig build -Doptimize=ReleaseFast
 
 .PHONY: test
 test:
+	zig build test
 
 .PHONY: fmt
 fmt:
-	gofmt -s -w -e  $(wildcard *.go)
+	zig fmt src/*.zig
 
 .PHONY: clean
 clean:
 	rm -f tcli *.txt *.log
-	rm -rf $(BUILDROOT)
+	rm -rf zig-out .zig-cache
 
 .PHONY: install
 install: $(EXEPATH)

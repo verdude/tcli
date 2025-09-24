@@ -10,3 +10,5 @@ assets/
 .terraform/
 .terraform*
 terraform.tfstate*
+.zig-cache
+zig-out
